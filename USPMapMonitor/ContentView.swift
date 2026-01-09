@@ -20,9 +20,14 @@ struct ContentView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            
             Map(position: $position) {
                 UserAnnotation()
+                
+                MapCircle(center: .cupertinoVillage, radius: 50)
+                    .foregroundStyle(.indigo.opacity(0.4))
+                
+                MapCircle(center: .appleCampus, radius: 50)
+                    .foregroundStyle(.pink.opacity(0.4))
             }
         }
     }
