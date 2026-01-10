@@ -40,6 +40,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     let manager = CLLocationManager()
     static let shared = LocationManager()
     var error: LocationError? = nil
+    var monitor: CLMonitor?
     
     var region: MKCoordinateRegion = MKCoordinateRegion()
     
@@ -47,6 +48,27 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         super.init()
         manager.desiredAccuracy = kCLLocationAccuracyBest
         self.manager.delegate = self
+    }
+    
+    func startRegionMonitoring() async {
+        monitor = await CLMonitor("RegionMonitor")
+        await monitor?.add(CLMonitor.CircularGeographicCondition.cupertinoVillage, identifier: "cupertinoVillage", assuming: .unsatisfied)
+        await monitor?.add(CLMonitor.CircularGeographicCondition.appleCampus, identifier: "appleCampus", assuming: .unsatisfied)
+        
+        Task {
+            for try await event in await monitor!.events {
+                switch event.state {
+                case .satisfied:
+                    print("satisfied")
+                case .unknown, .unsatisfied:
+                    print("unknown or unsatisfied")
+                case .unmonitored:
+                    print("unmonitored")
+                @unknown default:
+                    print("unknown default")
+                }
+            }
+        }
     }
 }
 

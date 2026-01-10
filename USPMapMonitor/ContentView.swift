@@ -30,6 +30,9 @@ struct ContentView: View {
                     .foregroundStyle(.pink.opacity(0.4))
             }
         }
+        .task {
+            await locationManager.startRegionMonitoring()
+        }
     }
 }
 
