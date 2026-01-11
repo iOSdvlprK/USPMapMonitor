@@ -35,12 +35,18 @@ enum LocationError: LocalizedError {
     }
 }
 
+struct LocationEvent: Identifiable {
+    let id = UUID()
+    let identifier: String
+}
+
 @Observable
 class LocationManager: NSObject, CLLocationManagerDelegate {
     let manager = CLLocationManager()
     static let shared = LocationManager()
     var error: LocationError? = nil
     var monitor: CLMonitor?
+    var locationEvent: LocationEvent?
     
     var region: MKCoordinateRegion = MKCoordinateRegion()
     
@@ -59,7 +65,8 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
             for try await event in await monitor!.events {
                 switch event.state {
                 case .satisfied:
-                    print("satisfied")
+                    guard let lastEvent = await monitor!.record(for: event.identifier)?.lastEvent else { continue }
+                    locationEvent = LocationEvent(identifier: lastEvent.identifier)
                 case .unknown, .unsatisfied:
                     print("unknown or unsatisfied")
                 case .unmonitored:

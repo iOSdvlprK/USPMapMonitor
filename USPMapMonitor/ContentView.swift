@@ -30,6 +30,14 @@ struct ContentView: View {
                     .foregroundStyle(.pink.opacity(0.4))
             }
         }
+        .sheet(item: $locationManager.locationEvent) { event in
+            VStack {
+                Image(artwork[event.identifier] ?? "apple-park")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                Text(event.identifier)
+            }
+        }
         .task {
             await locationManager.startRegionMonitoring()
         }
